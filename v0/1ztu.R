@@ -49,22 +49,26 @@ library(htmlwidgets)
 # bilin chromophore4,11.
 
 #----------------------------------------------------------------------------------------------------
-components=list(chromaphore=
-                    list(name="chromaphore",
-                         selection="not helix and not sheet and not turn and not water",
-                         representation="ball+stick",
-                         colorScheme="element",
-                         visible=TRUE),
-                pas=list(name="pas",
-                     selection="38-128",
-                     representation="cartoon",
-                     colorScheme="residueIndex",
-                     visible=TRUE),
-                gaf=list(name="gaf",
-                     selection="129-321",
-                     representation="cartoon",
-                     colorScheme="residueIndex",
-                     visible=TRUE))
+components.1ztu=list(chromaphore=list(name="chromaphore",
+                                      selection="not helix and not sheet and not turn and not water",
+                                      representation="ball+stick",
+                                      colorScheme="element",
+                                      visible=TRUE),
+                     chromaphoreAttachment=list(name="chromaphoreAttachment",
+                                      selection="24",
+                                      representation="ball+stick",
+                                      colorScheme="element",
+                                      visible=FALSE),
+                     pas=list(name="pas",
+                              selection="38-128",
+                              representation="cartoon",
+                              colorScheme="residueIndex",
+                              visible=TRUE),
+                     gaf=list(name="gaf",
+                              selection="129-321",
+                              representation="cartoon",
+                              colorScheme="residueIndex",
+                              visible=TRUE))
 
 nglRepresentations = c('angle', 'axes', 'ball+stick', 'backbone', 'base', 'cartoon', 'contact',
                        'dihedral', 'distance', 'helixorient', 'licorice', 'hyperball', 'label',
@@ -85,35 +89,24 @@ addResourcePath("www", "www");
 ui = shinyUI(fluidPage(
 
   tags$head(
-    tags$style("#nglShiny{height:90vh !important;}"),
+    tags$style("#nglShiny_1ztu{height:90vh !important;}"),
     tags$link(rel="icon", href="data:;base64,iVBORw0KGgo=")
     ),
 
   sidebarLayout(
      sidebarPanel(
         actionButton("fitButton", "Fit"),
-        actionButton("defaultViewButton", "Defaults"),
-        actionButton("clearRepresentationsButton", "Clear Representations"),
+        #actionButton("defaultViewButton", "Defaults"),
+        #actionButton("clearRepresentationsButton", "Clear Representations"),
         actionButton("toggleChromaphoreVisibilityButton", "Chromaphore"),
         actionButton("togglePASdomainVisibilityButton", "PAS"),
         actionButton("toggleGAFdomainVisibilityButton", "GAF"),
-        actionButton("showChromaphoreAttachmentSiteButton", "Chromaphore Attachment"),
-        actionButton("showCBDButton", "CBD"),
-        selectInput("pdbSelector", "", pdbIDs, selected=defaultPdbID),
-        selectInput("representationSelector", "", nglRepresentations, selected=defaultRepresentation),
-        selectInput("colorSchemeSelector", "", nglColorSchemes, selected=defaultColorScheme),
-        hr(),
-        radioButtons("domainChooser", "Domain",
-                     c("helix 1" = "helix001",
-                       "helix 2" = "helix002",
-                       "sheet 1" = "sheet001",
-                       "sheet 2" = "sheet002")
-                     ),
+        actionButton("toggleChromaphoreAttachmentSiteButton", "Chromaphore Attachment"),
         width=2
         ),
      mainPanel(
        tabsetPanel(type = "tabs",
-                   tabPanel("1ztu",  nglShinyOutput('nglShiny')),
+                   tabPanel("1ztu",  nglShinyOutput('nglShiny_1ztu')),
                    tabPanel("Notes", includeHTML("1ztu-notes.html")),
                    tabPanel("Chromaphore", includeHTML("chromaphore.html")),
                    tabPanel("Terms", includeHTML("terms.html")),
@@ -168,29 +161,27 @@ server = function(input, output, session) {
    #  #                                                               selection=selectionString))
    #  })
 
-   observeEvent(input$showChromaphoreAttachmentSiteButton, ignoreInit=TRUE, {
-     repString <- "ball+stick"
-     selectionString <- "24"
-     session$sendCustomMessage(type="showSelection", message=list(representation=repString,
-                                                                  selection=selectionString,
-                                                                  name="chromaphoreAttachment"))
+   observeEvent(input$toggleChromaphoreAttachmentSiteButton, ignoreInit=TRUE, {
+     newState <- !components.1ztu$chromaphoreAttachment$visible
+     components.1ztu$chromaphoreAttachment$visible <<- newState
+     setVisibility(session, "chromaphoreAttachment", newState)
      })
 
    observeEvent(input$toggleChromaphoreVisibilityButton, ignoreInit=TRUE, {
-     newState <- !components$chromaphore$visible
-     components$chromaphore$visible <<- newState
+     newState <- !components.1ztu$chromaphore$visible
+     components.1ztu$chromaphore$visible <<- newState
      setVisibility(session, "chromaphore", newState)
      })
 
    observeEvent(input$togglePASdomainVisibilityButton, ignoreInit=TRUE, {
-     newState <- !components$pas$visible
-     components$pas$visible <<- newState
+     newState <- !components.1ztu$pas$visible
+     components.1ztu$pas$visible <<- newState
      setVisibility(session, "pas", newState)
      })
 
    observeEvent(input$toggleGAFdomainVisibilityButton, ignoreInit=TRUE, {
-     newState <- !components$gaf$visible
-     components$gaf$visible <<- newState
+     newState <- !components.1ztu$gaf$visible
+     components.1ztu$gaf$visible <<- newState
      setVisibility(session, "gaf", newState)
      })
 
@@ -254,11 +245,16 @@ server = function(input, output, session) {
 
   output$value <- renderPrint({input$action})
 
-  options <- list(pdbID=defaultPdbID, namedComponents=components)
+  options.1ztu <- list(pdbID="1ztu", namedComponents=components.1ztu)
 
-  output$nglShiny <- renderNglShiny(
-    nglShiny(options, 300, 300)
+  output$nglShiny_1ztu <- renderNglShiny(
+    nglShiny(options.1ztu, 300, 300)
     )
+
+  #options.4our <- list(pdbID="4our")
+  #output$nglShiny.4our <- renderNglShiny(
+  #  nglShiny(options.4our, 300, 300)
+  #  )
 
 } # server
 #----------------------------------------------------------------------------------------------------
