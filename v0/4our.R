@@ -1,0 +1,254 @@
+library(shiny)
+library(nglShiny)
+library(htmlwidgets)
+#----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------
+# from https://www.uniprot.org/uniprot/P14713
+components.4our=list(
+                chromaphoreA=list(name="chromaphoreA",
+                         selection="[2VO] AND :A",
+                         representation="ball+stick",
+                         colorScheme="element",
+                         visible=TRUE),
+                chromaphoreB=list(name="chromaphoreB",
+                         selection="[2VO] AND :B",
+                         representation="ball+stick",
+                         colorScheme="element",
+                         visible=TRUE),
+                A=list(name="A",
+                     selection=":A",
+                     representation="cartoon",
+                     colorScheme="residueIndex",
+                     visible=TRUE),
+                B=list(name="B",
+                     selection=":B",
+                     representation="cartoon",
+                     colorScheme="residueIndex",
+                     visible=TRUE)
+                #pas2=list(name="pas2",
+                #     selection="786-857",
+                #     representation="cartoon",
+                #     colorScheme="residueIndex",
+                #     visible=TRUE),
+                #kinase=list(name="kinase",
+                #     selection="934-1153",
+                #     representation="cartoon",
+                #     colorScheme="residueIndex",
+                #     visible=TRUE)
+                )
+
+components.4ourX=list(all=
+                    list(name="all",
+                         selection="all",
+                         representation="cartoon",
+                         colorScheme="residueIndex",
+                         visible=TRUE))
+
+
+
+nglRepresentations = c('angle', 'axes', 'ball+stick', 'backbone', 'base', 'cartoon', 'contact',
+                       'dihedral', 'distance', 'helixorient', 'licorice', 'hyperball', 'label',
+                       'line', 'surface', 'point', 'ribbon', 'rocket', 'rope', 'spacefill', 'trace', 'unitcell',
+                       'validation')
+nglColorSchemes <- c('residueIndex', 'chainIndex', 'entityType', 'entityIndex')
+defaultRepresentation <- "cartoon"
+defaultColorScheme <- "residueIndex"
+#----------------------------------------------------------------------------------------------------
+# 1RQK, 3I4D: Photosynthetic reaction center from rhodobacter sphaeroides 2.4.1
+# crambin, 1crn: https://bmcbiophys.biomedcentral.com/articles/10.1186/s13628-014-0008-0
+addResourcePath("www", "www");
+ui = shinyUI(fluidPage(
+
+  tags$head(
+    tags$style("#nglShiny_4our{height:90vh !important;}"),
+    tags$link(rel="icon", href="data:;base64,iVBORw0KGgo=")
+    ),
+
+  sidebarLayout(
+     sidebarPanel(
+        actionButton("fitButton", "Fit"),
+        actionButton("defaultViewButton", "Defaults"),
+        actionButton("hideAllRepresentationsButton", "Hide All"),
+        actionButton("toggleChromaphoreAVisibilityButton", "Chromaphore A"),
+        actionButton("toggleChromaphoreBVisibilityButton", "Chromaphore B"),
+        actionButton("toggleAChainVisibilityButton", ":A"),
+        actionButton("toggleBChainVisibilityButton", ":B"),
+        actionButton("togglePASdomainVisibilityButton", "PAS"),
+        actionButton("toggleGAFdomainVisibilityButton", "GAF"),
+        hr(),
+        width=2
+        ),
+     mainPanel(
+       tabsetPanel(type = "tabs",
+                   tabPanel("4our",  nglShinyOutput('nglShiny_4our')),
+                   tabPanel("Notes", includeHTML("4our-notes.html")),
+                   tabPanel("Chromaphore", includeHTML("chromaphore.html")),
+                   tabPanel("Terms", includeHTML("terms.html")),
+                   tabPanel("Papers", includeHTML("papers.html"))
+                  ),
+        width=10
+        )
+     ) # sidebarLayout
+))
+#----------------------------------------------------------------------------------------------------
+server = function(input, output, session) {
+
+  observeEvent(input$fitButton, ignoreInit=TRUE, {
+     fit(session)
+     #session$sendCustomMessage(type="fit", message=list())
+     })
+
+  observeEvent(input$domainChooser, ignoreInit=TRUE, {
+     chosenDomain = input$domainChooser
+     printf("domains choice: %s", chosenDomain)
+     residueRange <- switch(chosenDomain,
+                            "helix001" = 7:19,
+                            "helix002" = 23:30,
+                            "sheet001" = 1:4,
+                            "sheet002" = 32:35
+                            )
+
+     residue.string <- paste(residueRange, collapse=", ")
+     printf("%s: %s", chosenDomain, residue.string)
+     session$sendCustomMessage(type="select", message=list(residue.string))
+       # 327 atoms, 46 residues
+       # HELIX    1  H1 ILE A    7  PRO A   19  13/10 CONFORMATION RES 17,19       13
+       # HELIX    2  H2 GLU A   23  THR A   30  1DISTORTED 3/10 AT RES 30           8
+       # SHEET    1  S1 2 THR A   1  CYS A   4  0
+       # SHEET    2  S1 2 CYS A  32  ILE A  35 -1
+     })
+
+  observeEvent(input$defaultViewButton, ignoreInit=TRUE, {
+     session$sendCustomMessage(type="removeAllRepresentations", message=list())
+     session$sendCustomMessage(type="setRepresentation", message=list(defaultRepresentation))
+     session$sendCustomMessage(type="setColorScheme", message=list(defaultColorScheme))
+     session$sendCustomMessage(type="fit", message=list())
+     })
+
+
+   #observeEvent(input$showChromaphoreButton, {
+   #  repString <- "ball+stick"
+   #  selectionString <- "not helix and not sheet and not turn and not water"
+   #  printf("calling showSelection on nglShiny object")
+   #  showSelection(session, repString, selectionString, name="chromaphore")
+   #  #session$sendCustomMessage(type="showSelection", message=list(representation=repString,
+   #  #                                                               selection=selectionString))
+   #  })
+
+   observeEvent(input$showChromaphoreAttachmentSiteButton, ignoreInit=TRUE, {
+     repString <- "ball+stick"
+     selectionString <- "24"
+     session$sendCustomMessage(type="showSelection", message=list(representation=repString,
+                                                                  selection=selectionString,
+                                                                  name="chromaphoreAttachment"))
+     })
+
+   observeEvent(input$toggleChromaphoreAVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$chromaphoreA$visible
+     components.4our$chromaphoreA$visible <<- newState
+     setVisibility(session, "chromaphoreA", newState)
+     })
+
+   observeEvent(input$toggleChromaphoreBVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$chromaphoreB$visible
+     components.4our$chromaphoreB$visible <<- newState
+     setVisibility(session, "chromaphoreB", newState)
+     })
+
+   observeEvent(input$toggleAChainVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$A$visible
+     components.4our$A$visible <<- newState
+     setVisibility(session, "A", newState)
+     })
+
+   observeEvent(input$toggleBChainVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$B$visible
+     components.4our$B$visible <<- newState
+     setVisibility(session, "B", newState)
+     })
+
+   observeEvent(input$toggleGAFdomainVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$gaf$visible
+     components.4our$gaf$visible <<- newState
+     setVisibility(session, "gaf", newState)
+     })
+
+   observeEvent(input$showCBDButton, ignoreInit=TRUE, {
+     repString <- "cartoon"
+     selectionString <- "1-321"
+     colorScheme = "residueIndex"
+     session$sendCustomMessage(type="showSelection", message=list(representation=repString,
+                                                                  selection=selectionString,
+                                                                  colorScheme=colorScheme,
+                                                                  name="CBD"))
+     })
+
+
+   observeEvent(input$showCBD.PAS.Button, ignoreInit=TRUE, {
+     repString <- "cartoon"
+     selectionString <- "38-128"
+     colorScheme = "residueIndex"
+     session$sendCustomMessage(type="showSelection", message=list(representation=repString,
+                                                                  selection=selectionString,
+                                                                  colorScheme=colorScheme,
+                                                                  name="PAS"))
+     })
+
+  observeEvent(input$showCBD.GAF.Button, ignoreInit=TRUE, {
+     repString <- "cartoon"
+     selectionString <- "129-321"
+     colorScheme = "residueIndex"
+     session$sendCustomMessage(type="showSelection", message=list(representation=repString,
+                                                                  selection=selectionString,
+                                                                  colorScheme=colorScheme,
+                                                                  name="GAF"))
+     })
+
+  observeEvent(input$hideAllRepresentationsButton, ignoreInit=TRUE, {
+      components.4our$chromaphoreA$visible <<- FALSE
+      components.4our$chromaphoreB$visible <<- FALSE
+      components.4our$A$visible <<- FALSE
+      components.4our$B$visible <<- FALSE
+      setVisibility(session, "chromaphoreA", FALSE)
+      setVisibility(session, "chromaphoreB", FALSE)
+      setVisibility(session, "A", FALSE)
+      setVisibility(session, "B", FALSE)
+
+      #updateSelectInput(session, "representationSelector", label=NULL, choices=NULL,  selected=defaultRepresentation)
+      #updateSelectInput(session, "colorSchemeSelector", label=NULL, choices=NULL,  selected=defaultColorScheme)
+      })
+
+  observeEvent(input$pdbSelector, ignoreInit=TRUE, {
+     choice = input$pdbSelector
+     printf("pdb: %s", choice)
+     session$sendCustomMessage(type="setPDB", message=list(choice))
+     updateSelectInput(session, "pdbSelector", label=NULL, choices=NULL,  selected=choice)
+     })
+
+  observeEvent(input$representationSelector, ignoreInit=TRUE, {
+     choice = input$representationSelector;
+     printf("rep: %s", choice)
+     session$sendCustomMessage(type="setRepresentation", message=list(choice))
+     updateSelectInput(session, "representationSelector", label=NULL, choices=NULL,  selected=choice)
+     })
+
+  observeEvent(input$colorSchemeSelector, ignoreInit=TRUE, {
+     choice = input$colorSchemeSelector;
+     printf("colorScheme: %s", choice)
+     session$sendCustomMessage(type="setColorScheme", message=list(choice))
+     updateSelectInput(session, "colorSchemeSelector", label=NULL, choices=NULL,  selected=choice)
+     })
+
+  output$value <- renderPrint({input$action})
+
+  options.4our <- list(pdbID="4our", namedComponents=components.4our)
+
+  output$nglShiny_4our <- renderNglShiny(
+    nglShiny(options.4our, 300, 300)
+    )
+
+} # server
+#----------------------------------------------------------------------------------------------------
+runApp(shinyApp(ui=ui, server=server), port=9001)
+
+
