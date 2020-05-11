@@ -2,29 +2,60 @@ library(shiny)
 library(nglShiny)
 library(htmlwidgets)
 #----------------------------------------------------------------------------------------------------
+#                 PAS 116–222 95 0.81
+#                 GAF 234–432 185 0.73
+#                 PHY 480–610 80 1.8
+# PHY without hairpin 480–610 43 0.97
+#             Hairpin 560–591
 #----------------------------------------------------------------------------------------------------
 # from https://www.uniprot.org/uniprot/P14713
 components.4our=list(
-                chromaphoreA=list(name="chromaphoreA",
-                         selection="[2VO] AND :A",
-                         representation="ball+stick",
-                         colorScheme="element",
-                         visible=TRUE),
-                chromaphoreB=list(name="chromaphoreB",
-                         selection="[2VO] AND :B",
-                         representation="ball+stick",
-                         colorScheme="element",
-                         visible=TRUE),
-                A=list(name="A",
-                     selection=":A",
-                     representation="cartoon",
-                     colorScheme="residueIndex",
-                     visible=TRUE),
-                B=list(name="B",
-                     selection=":B",
-                     representation="cartoon",
-                     colorScheme="residueIndex",
-                     visible=TRUE)
+    PAS=list(name="PAS",
+                  selection="116-222 AND :A",
+                  representation="cartoon",
+                  colorScheme="residueIndex",
+                  visible=TRUE),
+    GAF=list(name="GAF",
+                  selection="234-432 AND :A",
+                  representation="cartoon",
+                  colorScheme="residueIndex",
+                  visible=TRUE),
+    PHY=list(name="PHY",
+                  selection="480-610 AND :A",
+                  representation="cartoon",
+                  colorScheme="residueIndex",
+                  visible=TRUE),
+    pyrrole.D=list(name="pyrrole.D",
+                   selection="[2VO] AND :A and (.C01 OR .C02 OR .C03 OR .C04 OR .C05 OR .C06 OR .C42 OR .N41 OR .O43)",
+                   representation="ball+stick",
+                   colorScheme="element",
+                   visible=TRUE),
+    hairpinA=list(name="hairpinA",
+                  selection="560-591 AND :A",
+                  representation="cartoon",
+                  colorScheme="residueIndex",
+                  visible=TRUE),
+    chromaphoreA=list(name="chromaphoreA",
+                      selection="[2VO] AND :A",
+                      representation="ball+stick",
+                      colorScheme="element",
+                      visible=TRUE),
+    chromaphoreB=list(name="chromaphoreB",
+                      selection="[2VO] AND :B",
+                      representation="ball+stick",
+                      colorScheme="element",
+                      visible=TRUE),
+    A=list(name="A",
+           selection=":A",
+           representation="cartoon",
+           colorScheme="residueIndex",
+           visible=TRUE),
+    B=list(name="B",
+           selection=":B",
+           representation="cartoon",
+           colorScheme="residueIndex",
+           visible=TRUE)
+
                 #pas2=list(name="pas2",
                 #     selection="786-857",
                 #     representation="cartoon",
@@ -75,6 +106,13 @@ ui = shinyUI(fluidPage(
         actionButton("toggleBChainVisibilityButton", ":B"),
         actionButton("togglePASdomainVisibilityButton", "PAS"),
         actionButton("toggleGAFdomainVisibilityButton", "GAF"),
+        actionButton("toggleHairpinAVisibilityButton", "Hairpin A"),
+        actionButton("togglePASVisibilityButton", "PAS"),
+        actionButton("toggleGAFVisibilityButton", "GAF"),
+        actionButton("togglePHYVisibilityButton", "PHY"),
+        actionButton("togglePyrroleDVisibilityButton", "Pyrrole D"),
+
+
         hr(),
         width=2
         ),
@@ -155,6 +193,37 @@ server = function(input, output, session) {
      setVisibility(session, "chromaphoreB", newState)
      })
 
+
+   observeEvent(input$toggleHairpinAVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$hairpinA$visible
+     components.4our$hairpinA$visible <<- newState
+     setVisibility(session, "hairpinA", newState)
+     })
+
+   observeEvent(input$togglePASVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$PAS$visible
+     components.4our$PAS$visible <<- newState
+     setVisibility(session, "PAS", newState)
+     })
+
+   observeEvent(input$toggleGAFVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$GAF$visible
+     components.4our$GAF$visible <<- newState
+     setVisibility(session, "GAF", newState)
+     })
+
+   observeEvent(input$togglePHYVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$PHY$visible
+     components.4our$PHY$visible <<- newState
+     setVisibility(session, "PHY", newState)
+     })
+
+   observeEvent(input$togglePyrroleDVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$pyrrole.D$visible
+     components.4our$pyrrole.D$visible <<- newState
+     setVisibility(session, "pyrrole.D", newState)
+     })
+
    observeEvent(input$toggleAChainVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$A$visible
      components.4our$A$visible <<- newState
@@ -209,11 +278,22 @@ server = function(input, output, session) {
       components.4our$chromaphoreB$visible <<- FALSE
       components.4our$A$visible <<- FALSE
       components.4our$B$visible <<- FALSE
+      components.4our$hairpinA$visible <<- FALSE
+      components.4our$PAS$visible <<- FALSE
+      components.4our$GAF$visible <<- FALSE
+      components.4our$PHY$visible <<- FALSE
+      components.4our$pyrrole.D$visible <<- FALSE
+
+
       setVisibility(session, "chromaphoreA", FALSE)
       setVisibility(session, "chromaphoreB", FALSE)
       setVisibility(session, "A", FALSE)
       setVisibility(session, "B", FALSE)
-
+      setVisibility(session, "hairpinA", FALSE)
+      setVisibility(session, "PAS", FALSE)
+      setVisibility(session, "GAF", FALSE)
+      setVisibility(session, "PHY", FALSE)
+      setVisibility(session, "pyrrole.D", FALSE)
       #updateSelectInput(session, "representationSelector", label=NULL, choices=NULL,  selected=defaultRepresentation)
       #updateSelectInput(session, "colorSchemeSelector", label=NULL, choices=NULL,  selected=defaultColorScheme)
       })
