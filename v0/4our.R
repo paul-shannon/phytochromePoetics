@@ -10,21 +10,26 @@ library(htmlwidgets)
 #----------------------------------------------------------------------------------------------------
 # from https://www.uniprot.org/uniprot/P14713
 components.4our=list(
+    A=list(name="A",
+           selection=":A",
+           representation="cartoon",
+           colorScheme="residueIndex",
+           visible=FALSE),
     PAS=list(name="PAS",
                   selection="116-222 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=TRUE),
+                  visible=FALSE),
     GAF=list(name="GAF",
                   selection="234-432 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=TRUE),
+                  visible=FALSE),
     PHY=list(name="PHY",
                   selection="480-610 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=TRUE),
+                  visible=FALSE),
     pyrrole.D=list(name="pyrrole.D",
                    selection="[2VO] AND :A and (.C01 OR .C02 OR .C03 OR .C04 OR .C05 OR .C06 OR .C42 OR .N41 OR .O43)",
                    representation="ball+stick",
@@ -35,26 +40,21 @@ components.4our=list(
                   representation="cartoon",
                   colorScheme="residueIndex",
                   visible=TRUE),
-    chromaphoreA=list(name="chromaphoreA",
+    chromophoreA=list(name="chromophoreA",
                       selection="[2VO] AND :A",
                       representation="ball+stick",
                       colorScheme="element",
-                      visible=TRUE),
-    chromaphoreB=list(name="chromaphoreB",
-                      selection="[2VO] AND :B",
-                      representation="ball+stick",
-                      colorScheme="element",
-                      visible=TRUE),
-    A=list(name="A",
-           selection=":A",
-           representation="cartoon",
-           colorScheme="residueIndex",
-           visible=TRUE),
-    B=list(name="B",
-           selection=":B",
-           representation="cartoon",
-           colorScheme="residueIndex",
-           visible=TRUE)
+                      visible=FALSE)
+#    chromophoreB=list(name="chromophoreB",
+#                      selection="[2VO] AND :B",
+#                      representation="ball+stick",
+#                      colorScheme="element",
+#                      visible=TRUE),
+#    B=list(name="B",
+#           selection=":B",
+#           representation="cartoon",
+#           colorScheme="residueIndex",
+#           visible=TRUE)
 
                 #pas2=list(name="pas2",
                 #     selection="786-857",
@@ -98,18 +98,24 @@ ui = shinyUI(fluidPage(
   sidebarLayout(
      sidebarPanel(
         actionButton("fitButton", "Fit"),
-        actionButton("defaultViewButton", "Defaults"),
+        #actionButton("defaultViewButton", "Defaults"),
         actionButton("hideAllRepresentationsButton", "Hide All"),
-        actionButton("toggleChromaphoreAVisibilityButton", "Chromaphore A"),
-        actionButton("toggleChromaphoreBVisibilityButton", "Chromaphore B"),
-        actionButton("toggleAChainVisibilityButton", ":A"),
-        actionButton("toggleBChainVisibilityButton", ":B"),
-        actionButton("togglePASdomainVisibilityButton", "PAS"),
-        actionButton("toggleGAFdomainVisibilityButton", "GAF"),
-        actionButton("toggleHairpinAVisibilityButton", "Hairpin A"),
+        actionButton("toggleAChainVisibilityButton", "Show All"),
+        br(), br(),
+        #actionButton("toggleChromophoreBVisibilityButton", "Chromophore B"),
+        #actionButton("toggleBChainVisibilityButton", ":B"),
+        #actionButton("togglePASdomainVisibilityButton", "PAS"),
+        #actionButton("toggleGAFdomainVisibilityButton", "GAF"),
+        #br(); br()
+        h5("Domains"),
         actionButton("togglePASVisibilityButton", "PAS"),
         actionButton("toggleGAFVisibilityButton", "GAF"),
         actionButton("togglePHYVisibilityButton", "PHY"),
+        actionButton("toggleHairpinAVisibilityButton", "PHY Hairpin"),
+
+        br(), br(),
+        h5("Prosthetic group"),
+        actionButton("toggleChromophoreAVisibilityButton", "Chromophore"),
         actionButton("togglePyrroleDVisibilityButton", "Pyrrole D"),
 
 
@@ -118,9 +124,10 @@ ui = shinyUI(fluidPage(
         ),
      mainPanel(
        tabsetPanel(type = "tabs",
-                   tabPanel("4our",  nglShinyOutput('nglShiny_4our')),
+                   tabPanel("Introduction",  includeHTML("intro.html")),
+                   tabPanel("PhyB (4our:A)",  nglShinyOutput('nglShiny_4our')),
                    tabPanel("Notes", includeHTML("4our-notes.html")),
-                   tabPanel("Chromaphore", includeHTML("chromaphore.html")),
+                   tabPanel("Chromophore", includeHTML("chromophore.html")),
                    tabPanel("Terms", includeHTML("terms.html")),
                    tabPanel("Papers", includeHTML("papers.html"))
                   ),
@@ -131,9 +138,31 @@ ui = shinyUI(fluidPage(
 #----------------------------------------------------------------------------------------------------
 server = function(input, output, session) {
 
+   hideAll <- function(){
+      components.4our$chromophoreA$visible <<- FALSE
+      components.4our$chromophoreB$visible <<- FALSE
+      components.4our$A$visible <<- FALSE
+      components.4our$B$visible <<- FALSE
+      components.4our$hairpinA$visible <<- FALSE
+      components.4our$PAS$visible <<- FALSE
+      components.4our$GAF$visible <<- FALSE
+      components.4our$PHY$visible <<- FALSE
+      components.4our$pyrrole.D$visible <<- FALSE
+
+      setVisibility(session, "chromophoreA", FALSE)
+      setVisibility(session, "chromophoreB", FALSE)
+      setVisibility(session, "A", FALSE)
+      setVisibility(session, "B", FALSE)
+      setVisibility(session, "hairpinA", FALSE)
+      setVisibility(session, "PAS", FALSE)
+      setVisibility(session, "GAF", FALSE)
+      setVisibility(session, "PHY", FALSE)
+      setVisibility(session, "pyrrole.D", FALSE)
+
+      }
+
   observeEvent(input$fitButton, ignoreInit=TRUE, {
      fit(session)
-     #session$sendCustomMessage(type="fit", message=list())
      })
 
   observeEvent(input$domainChooser, ignoreInit=TRUE, {
@@ -164,33 +193,26 @@ server = function(input, output, session) {
      })
 
 
-   #observeEvent(input$showChromaphoreButton, {
-   #  repString <- "ball+stick"
-   #  selectionString <- "not helix and not sheet and not turn and not water"
-   #  printf("calling showSelection on nglShiny object")
-   #  showSelection(session, repString, selectionString, name="chromaphore")
-   #  #session$sendCustomMessage(type="showSelection", message=list(representation=repString,
-   #  #                                                               selection=selectionString))
-   #  })
-
-   observeEvent(input$showChromaphoreAttachmentSiteButton, ignoreInit=TRUE, {
+   observeEvent(input$showChromophoreAttachmentSiteButton, ignoreInit=TRUE, {
      repString <- "ball+stick"
      selectionString <- "24"
      session$sendCustomMessage(type="showSelection", message=list(representation=repString,
                                                                   selection=selectionString,
-                                                                  name="chromaphoreAttachment"))
+                                                                  name="chromophoreAttachment"))
      })
 
-   observeEvent(input$toggleChromaphoreAVisibilityButton, ignoreInit=TRUE, {
-     newState <- !components.4our$chromaphoreA$visible
-     components.4our$chromaphoreA$visible <<- newState
-     setVisibility(session, "chromaphoreA", newState)
+   observeEvent(input$toggleChromophoreAVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$chromophoreA$visible
+     components.4our$chromophoreA$visible <<- newState
+     components.4our$pyrrole.D$visible <<- newState
+     setVisibility(session, "chromophoreA", newState)
+     setVisibility(session, "pyrrole.D", newState)
      })
 
-   observeEvent(input$toggleChromaphoreBVisibilityButton, ignoreInit=TRUE, {
-     newState <- !components.4our$chromaphoreB$visible
-     components.4our$chromaphoreB$visible <<- newState
-     setVisibility(session, "chromaphoreB", newState)
+   observeEvent(input$toggleChromophoreBVisibilityButton, ignoreInit=TRUE, {
+     newState <- !components.4our$chromophoreB$visible
+     components.4our$chromophoreB$visible <<- newState
+     setVisibility(session, "chromophoreB", newState)
      })
 
 
@@ -227,6 +249,11 @@ server = function(input, output, session) {
    observeEvent(input$toggleAChainVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$A$visible
      components.4our$A$visible <<- newState
+     setVisibility(session, "A", newState)
+     })
+
+   observeEvent(input$showAllButton, ignoreInit=TRUE, {
+     hideAll()
      setVisibility(session, "A", newState)
      })
 
@@ -274,28 +301,29 @@ server = function(input, output, session) {
      })
 
   observeEvent(input$hideAllRepresentationsButton, ignoreInit=TRUE, {
-      components.4our$chromaphoreA$visible <<- FALSE
-      components.4our$chromaphoreB$visible <<- FALSE
-      components.4our$A$visible <<- FALSE
-      components.4our$B$visible <<- FALSE
-      components.4our$hairpinA$visible <<- FALSE
-      components.4our$PAS$visible <<- FALSE
-      components.4our$GAF$visible <<- FALSE
-      components.4our$PHY$visible <<- FALSE
-      components.4our$pyrrole.D$visible <<- FALSE
-
-
-      setVisibility(session, "chromaphoreA", FALSE)
-      setVisibility(session, "chromaphoreB", FALSE)
-      setVisibility(session, "A", FALSE)
-      setVisibility(session, "B", FALSE)
-      setVisibility(session, "hairpinA", FALSE)
-      setVisibility(session, "PAS", FALSE)
-      setVisibility(session, "GAF", FALSE)
-      setVisibility(session, "PHY", FALSE)
-      setVisibility(session, "pyrrole.D", FALSE)
-      #updateSelectInput(session, "representationSelector", label=NULL, choices=NULL,  selected=defaultRepresentation)
-      #updateSelectInput(session, "colorSchemeSelector", label=NULL, choices=NULL,  selected=defaultColorScheme)
+     hideAll()
+#      components.4our$chromophoreA$visible <<- FALSE
+#      components.4our$chromophoreB$visible <<- FALSE
+#      components.4our$A$visible <<- FALSE
+#      components.4our$B$visible <<- FALSE
+#      components.4our$hairpinA$visible <<- FALSE
+#      components.4our$PAS$visible <<- FALSE
+#      components.4our$GAF$visible <<- FALSE
+#      components.4our$PHY$visible <<- FALSE
+#      components.4our$pyrrole.D$visible <<- FALSE
+#
+#
+#      setVisibility(session, "chromophoreA", FALSE)
+#      setVisibility(session, "chromophoreB", FALSE)
+#      setVisibility(session, "A", FALSE)
+#      setVisibility(session, "B", FALSE)
+#      setVisibility(session, "hairpinA", FALSE)
+#      setVisibility(session, "PAS", FALSE)
+#      setVisibility(session, "GAF", FALSE)
+#      setVisibility(session, "PHY", FALSE)
+#      setVisibility(session, "pyrrole.D", FALSE)
+#      #updateSelectInput(session, "representationSelector", label=NULL, choices=NULL,  selected=defaultRepresentation)
+#      #updateSelectInput(session, "colorSchemeSelector", label=NULL, choices=NULL,  selected=defaultColorScheme)
       })
 
   observeEvent(input$pdbSelector, ignoreInit=TRUE, {
