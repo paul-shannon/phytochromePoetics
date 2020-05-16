@@ -357,6 +357,7 @@ server = function(input, output, session) {
 
 } # server
 #----------------------------------------------------------------------------------------------------
-runApp(shinyApp(ui=ui, server=server), port=9001)
+#runApp(shinyApp(ui=ui, server=server), port=9001)
+shinyApp(ui=ui, server=server)
 
 
