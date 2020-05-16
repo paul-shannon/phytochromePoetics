@@ -1,23 +1,28 @@
 <div style="margin-left: 20px;">
-<h4> The Structure of a Plant Photosensory Module</h4>
+<h4> The Structure of a Plant Photosensory Module (version 0.1.0) </h4>
 
-    Plants are exquisitely sensitive to light.  They use the information thus acquired to decide
+    Plants are exquisitely sensitive to light, using the knowledge of the environment they acquire to decide
     <ul>
       <li> when to germinate, leaf and flower
       <li> where, when and how to grow
     </ul>
 
-    "Knowledge" and "decide" are terms we most commonly use to describe animal - and especially
+    "Knowledge" and "decide" are terms we typically use to describe animal - and especially
     human - cognitive capabilities.  I use these terms here intentionally - to
     highlight the common ground shared by plants and animals, by oak and human, microbe, and (our
-    focus here) the mouse-eared cress.
+    focus here) the <a href="https://en.wikipedia.org/wiki/Arabidopsis_thaliana"
+		       target=_blank>mouse-eared cress</a>,
+    the common laboratory model organism used in many  botannical studies.
 
-    <p> We usually see an immense gulf between humans and other living creatures.  We could also
-    attend to the complexities and capabilities found in all organisms.
+    <p><p> We humans usually see an immense gulf between humans and other living creatures.  Molecular
+    biology lets us see into the complexities and capabilities found in all organisms.  The gulf
+    seems no longer so wide.
 
    <p> This project argues for seeing things that way, for the "anti-narcissism of continuous variation"
-     (Eduardo Viveiros de Castro).   The big differences are uncontested.  The continuous variation
-     and similarities are also worthy of our attention.
+     recommended by Brazilian anthropologist <a href="https://monoskop.org/Eduardo_Viveiros_de_Castro",
+					       target=_blank>Eduardo Viveiros de Castro</a>.
+     The big differences
+     are uncontested.  The continuous variation and similarities are also worthy of our attention.
 
    <p><p>I take <b>cognitive</b> to describe processes in which
       <ol>
@@ -29,23 +34,37 @@
     <p>This web application explores the first of these steps: the collection of information from
       the environment.  Fifty years of evolving technique produced in 2014 the first
       molecular structure of a plant phytochrome holoprotein - a complex amino acid
-      structure with a red light sensitive molecule tucked inside.  (Full attributions
-      available in the <b>Papers</b> tab.  The molecule presented here is PhyB from
-      Arabidopsis thaliana (mouse-ear cress), crystallography and model construction
-      by Richard Vierstra's lab at the University of Wisconsin.
+      structure with a red light sensitive molecule tucked inside.
 
-    <p> My projec is indebted to that lab, to the research community to which
+      The molecule presented here is PhyB from Arabidopsis thaliana (mouse-ear cress),
+      crystallography and model construction by Richard Vierstra's
+      <a href="https://vierstra.genetics.wisc.edu/phytochrome.html" target=_blank>lab</a>
+      at the University of Wisconsin.  
+
+    <p> My project is indebted to that lab, to the research community to which
       it belongs, and to an entire swarm and history of talented software engineers: to many at RStudio for
-      shiny, to Alex Rose and colleaues for ngl, to uncounted others who write and maintain 
+      shiny, to Alex Rose and colleaues for ngl, to uncountable others who write and maintain 
       the many layers and pieces of inter-operating open source software upon which we all depend.
 
-    <p><image src="www/pyrroleDandHairpin.png" width=120>
 
-    <p> The webapp opens with a selective view of the light-responsive circular pyrrole
-      nestled inside a hairpin of the Phy domain of the PhyB molecule (as pictured above).
-      Buttons to the  left in the molecular display toggle the visibility of many parts of the structure.
+    <p> The webapp proper opens when you click on the <b>PhyB</b> tab above, showing a selective 
+       view of the light-responsive circular pyrrole nestled inside a hairpin of the Phy domain of the PhyB molecule:
+
+    <p><image src="www/pyrroleDandHairpin.png" width=120 style="margin-left:200px"><p>
+
+      
+      This 4-carbon, 1-nitrogen ring <b>pyrrole D</b> changes orientation upon aborbing a photon of red light.
+      That tiny shift introduces a kink into the surrounding protein domains, initiating
+      a long chain of signaling events which are evntuallyis eventually interpreted, in combination
+      with thousands of other signals - reinforcing, contradicting, tempering signals - to produce
+      macro-scale changes in plant behavior:  germinate <i>now</i>, grow a  branch in <i>that</i>
+      direction,  prepare to flower.
+      
+      <p><b>Buttons</b> to the  left in the molecular display toggle the visibility of many parts of the structure.
       (I will be adding more substructures and ligands soon.)
       Mouse actions zoom, pan and rotate the model.
     
-    
+      <p>My plan is to extend this webapp to capture more of the conformational change of this
+	molecule as it responds to varying amounts of red and far-red light.
+
 </div>

@@ -45,35 +45,7 @@ components.4our=list(
                       representation="ball+stick",
                       colorScheme="element",
                       visible=FALSE)
-#    chromophoreB=list(name="chromophoreB",
-#                      selection="[2VO] AND :B",
-#                      representation="ball+stick",
-#                      colorScheme="element",
-#                      visible=TRUE),
-#    B=list(name="B",
-#           selection=":B",
-#           representation="cartoon",
-#           colorScheme="residueIndex",
-#           visible=TRUE)
-
-                #pas2=list(name="pas2",
-                #     selection="786-857",
-                #     representation="cartoon",
-                #     colorScheme="residueIndex",
-                #     visible=TRUE),
-                #kinase=list(name="kinase",
-                #     selection="934-1153",
-                #     representation="cartoon",
-                #     colorScheme="residueIndex",
-                #     visible=TRUE)
-                )
-
-components.4ourX=list(all=
-                    list(name="all",
-                         selection="all",
-                         representation="cartoon",
-                         colorScheme="residueIndex",
-                         visible=TRUE))
+    ) # components.4our
 
 
 
@@ -88,6 +60,7 @@ defaultColorScheme <- "residueIndex"
 # 1RQK, 3I4D: Photosynthetic reaction center from rhodobacter sphaeroides 2.4.1
 # crambin, 1crn: https://bmcbiophys.biomedcentral.com/articles/10.1186/s13628-014-0008-0
 addResourcePath("www", "www");
+
 ui = shinyUI(fluidPage(
 
   tags$head(
@@ -95,46 +68,42 @@ ui = shinyUI(fluidPage(
     tags$link(rel="icon", href="data:;base64,iVBORw0KGgo=")
     ),
 
-  sidebarLayout(
-     sidebarPanel(
-        actionButton("fitButton", "Fit"),
-        #actionButton("defaultViewButton", "Defaults"),
-        actionButton("hideAllRepresentationsButton", "Hide All"),
-        actionButton("toggleAChainVisibilityButton", "Show All"),
-        br(), br(),
-        #actionButton("toggleChromophoreBVisibilityButton", "Chromophore B"),
-        #actionButton("toggleBChainVisibilityButton", ":B"),
-        #actionButton("togglePASdomainVisibilityButton", "PAS"),
-        #actionButton("toggleGAFdomainVisibilityButton", "GAF"),
-        #br(); br()
-        h5("Domains"),
-        actionButton("togglePASVisibilityButton", "PAS"),
-        actionButton("toggleGAFVisibilityButton", "GAF"),
-        actionButton("togglePHYVisibilityButton", "PHY"),
-        actionButton("toggleHairpinAVisibilityButton", "PHY Hairpin"),
+  tabsetPanel(type = "tabs",
+              tabPanel("Introduction",  includeHTML("intro.html")),
+              tabPanel("PhyB",
+                       sidebarLayout(
+                           sidebarPanel(
+                               actionButton("fitButton", "Fit"),
+                                        #actionButton("defaultViewButton", "Defaults"),
+                               actionButton("hideAllRepresentationsButton", "Hide All"),
+                               actionButton("toggleAChainVisibilityButton", "Show All"),
+                               br(), br(),
+                                        #actionButton("toggleChromophoreBVisibilityButton", "Chromophore B"),
+                                        #actionButton("toggleBChainVisibilityButton", ":B"),
+                                        #actionButton("togglePASdomainVisibilityButton", "PAS"),
+                                        #actionButton("toggleGAFdomainVisibilityButton", "GAF"),
+                                        #br(); br()
+                               h5("Domains"),
+                               actionButton("togglePASVisibilityButton", "PAS"),
+                               actionButton("toggleGAFVisibilityButton", "GAF"),
+                               actionButton("togglePHYVisibilityButton", "PHY"),
+                               actionButton("toggleHairpinAVisibilityButton", "PHY Hairpin"),
 
-        br(), br(),
-        h5("Prosthetic group"),
-        actionButton("toggleChromophoreAVisibilityButton", "Chromophore"),
-        actionButton("togglePyrroleDVisibilityButton", "Pyrrole D"),
-
-
-        hr(),
-        width=2
-        ),
-     mainPanel(
-       tabsetPanel(type = "tabs",
-                   tabPanel("Introduction",  includeHTML("intro.html")),
-                   tabPanel("PhyB (4our:A)",  nglShinyOutput('nglShiny_4our')),
-                   tabPanel("Notes", includeHTML("4our-notes.html")),
-                   tabPanel("Chromophore", includeHTML("chromophore.html")),
-                   tabPanel("Terms", includeHTML("terms.html")),
-                   tabPanel("Papers", includeHTML("papers.html"))
-                  ),
-        width=10
-        )
-     ) # sidebarLayout
-))
+                               br(), br(),
+                               h5("Prosthetic group"),
+                               actionButton("toggleChromophoreAVisibilityButton", "Chromophore"),
+                               actionButton("togglePyrroleDVisibilityButton", "Pyrrole D"),
+                               width=2),
+                           mainPanel(nglShinyOutput('nglShiny_4our'),width=10)
+                           ),   # sidebarLayout
+                       ), # PhyB tabPanel
+              tabPanel("Notes", includeHTML("4our-notes.html")),
+              tabPanel("Chromophore", includeHTML("chromophore.html")),
+              tabPanel("Terms", includeHTML("terms.html")),
+              tabPanel("Papers", includeHTML("papers.html"))
+              ) # tabsetPanel
+  ) # fluidPage
+) # shinyUI
 #----------------------------------------------------------------------------------------------------
 server = function(input, output, session) {
 
@@ -357,7 +326,7 @@ server = function(input, output, session) {
 
 } # server
 #----------------------------------------------------------------------------------------------------
-#runApp(shinyApp(ui=ui, server=server), port=9001)
+#runApp(shinyApp(ui=ui, server=server), port=5669)
 shinyApp(ui=ui, server=server)
 
 
