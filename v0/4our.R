@@ -1,6 +1,12 @@
 library(shiny)
 library(nglShiny)
 library(htmlwidgets)
+library(shinyBS)
+library(yaml)
+#----------------------------------------------------------------------------------------------------
+tooltips <- yaml.load_file("tooltips.yaml")
+for(i in 1:length(tooltips)) tooltips[[i]]$text <- paste(tooltips[[i]]$text, collapse=" ")
+printf("length of tooltips read: %d", length(tooltips))
 #----------------------------------------------------------------------------------------------------
 printf <- function(...)print(noquote(sprintf(...)))
 #----------------------------------------------------------------------------------------------------
@@ -69,6 +75,9 @@ ui = shinyUI(fluidPage(
     tags$style("#nglShiny_4our{height:90vh !important;}"),
     tags$link(rel="icon", href="data:;base64,iVBORw0KGgo=")
     ),
+
+  includeCSS("phytochrome.css"),
+  with(tooltips[[1]], bsTooltip(selector, text, location, options = list(container = "body", html=TRUE))),
 
   tabsetPanel(type = "tabs",
               tabPanel("Introduction",  includeHTML("intro.html")),
@@ -328,7 +337,7 @@ server = function(input, output, session) {
 
 } # server
 #----------------------------------------------------------------------------------------------------
-#runApp(shinyApp(ui=ui, server=server), port=5669)
-shinyApp(ui=ui, server=server)
+runApp(shinyApp(ui=ui, server=server), port=5669)
+#shinyApp(ui=ui, server=server)
 
 

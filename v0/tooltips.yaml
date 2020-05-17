@@ -1,0 +1,11 @@
+PHY:
+   selector: togglePHYVisibilityButton
+   text: ['A unique feature of the phytochrome structure is a',
+	  'long, <b>tongue-like protrusion</b> from the PHY domain that',
+	  'seals the chromophore pocket and stabilizes the',
+	  'photoactivated far-red-absorbing state (Pfr). The tongue',
+	  'carries a conserved PRxSF motif, from which an arginine',
+	  'finger points into the chromophore pocket close to ring D',
+	  'forming a salt bridge with a conserved aspartate residue.']
+   location: right
+   
