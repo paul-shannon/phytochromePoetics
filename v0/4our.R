@@ -21,7 +21,7 @@ components.4our=list(
                   selection="116-222 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=FALSE),
+                  visible=TRUE),
     GAF=list(name="GAF",
                   selection="234-432 AND :A",
                   representation="cartoon",
@@ -31,7 +31,7 @@ components.4our=list(
                   selection="480-610 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=FALSE),
+                  visible=TRUE),
     pyrrole.D=list(name="pyrrole.D",
                    selection="[2VO] AND :A and (.C01 OR .C02 OR .C03 OR .C04 OR .C05 OR .C06 OR .C42 OR .N41 OR .O43)",
                    representation="ball+stick",
@@ -41,7 +41,7 @@ components.4our=list(
                   selection="560-591 AND :A",
                   representation="cartoon",
                   colorScheme="residueIndex",
-                  visible=TRUE),
+                  visible=FALSE),
     chromophoreA=list(name="chromophoreA",
                       selection="[2VO] AND :A",
                       representation="ball+stick",
@@ -328,7 +328,7 @@ server = function(input, output, session) {
 
 } # server
 #----------------------------------------------------------------------------------------------------
-#runApp(shinyApp(ui=ui, server=server), port=5669)
-shinyApp(ui=ui, server=server)
+runApp(shinyApp(ui=ui, server=server), port=5669)
+#shinyApp(ui=ui, server=server)
 
 
