@@ -64,6 +64,9 @@ nglRepresentations = c('angle', 'axes', 'ball+stick', 'backbone', 'base', 'carto
 nglColorSchemes <- c('residueIndex', 'chainIndex', 'entityType', 'entityIndex')
 defaultRepresentation <- "cartoon"
 defaultColorScheme <- "residueIndex"
+options.4our <- list(pdbID="4our", htmlContainer="nglShiny_4our", namedComponents=components.4our)
+ngl.4our <- nglShiny(options.4our, 300, 300, elementId="nglShiny_4our")
+
 #----------------------------------------------------------------------------------------------------
 # 1RQK, 3I4D: Photosynthetic reaction center from rhodobacter sphaeroides 2.4.1
 # crambin, 1crn: https://bmcbiophys.biomedcentral.com/articles/10.1186/s13628-014-0008-0
@@ -129,20 +132,19 @@ server = function(input, output, session) {
       components.4our$PHY$visible <<- FALSE
       components.4our$pyrrole.D$visible <<- FALSE
 
-      setVisibility(session, "chromophoreA", FALSE)
-      setVisibility(session, "chromophoreB", FALSE)
-      setVisibility(session, "A", FALSE)
-      setVisibility(session, "B", FALSE)
-      setVisibility(session, "hairpinA", FALSE)
-      setVisibility(session, "PAS", FALSE)
-      setVisibility(session, "GAF", FALSE)
-      setVisibility(session, "PHY", FALSE)
-      setVisibility(session, "pyrrole.D", FALSE)
-
+      setVisibility(session, htmlContainer="nglShiny_4our", "chromophoreA", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "chromophoreB", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "A", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "B", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "hairpinA", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "PAS", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "GAF", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "PHY", FALSE)
+      setVisibility(session, htmlContainer="nglShiny_4our", "pyrrole.D", FALSE)
       }
 
   observeEvent(input$fitButton, ignoreInit=TRUE, {
-     fit(session)
+     fit(session, htmlContainer="nglShiny_4our")
      })
 
   observeEvent(input$domainChooser, ignoreInit=TRUE, {
@@ -185,68 +187,68 @@ server = function(input, output, session) {
      newState <- !components.4our$chromophoreA$visible
      components.4our$chromophoreA$visible <<- newState
      components.4our$pyrrole.D$visible <<- newState
-     setVisibility(session, "chromophoreA", newState)
-     setVisibility(session, "pyrrole.D", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "chromophoreA", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "pyrrole.D", newState)
      })
 
    observeEvent(input$toggleChromophoreBVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$chromophoreB$visible
      components.4our$chromophoreB$visible <<- newState
-     setVisibility(session, "chromophoreB", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "chromophoreB", newState)
      })
 
 
    observeEvent(input$toggleHairpinAVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$hairpinA$visible
      components.4our$hairpinA$visible <<- newState
-     setVisibility(session, "hairpinA", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "hairpinA", newState)
      })
 
    observeEvent(input$togglePASVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$PAS$visible
      components.4our$PAS$visible <<- newState
-     setVisibility(session, "PAS", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "PAS", newState)
      })
 
    observeEvent(input$toggleGAFVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$GAF$visible
      components.4our$GAF$visible <<- newState
-     setVisibility(session, "GAF", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "GAF", newState)
      })
 
    observeEvent(input$togglePHYVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$PHY$visible
      components.4our$PHY$visible <<- newState
-     setVisibility(session, "PHY", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "PHY", newState)
      })
 
    observeEvent(input$togglePyrroleDVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$pyrrole.D$visible
      components.4our$pyrrole.D$visible <<- newState
-     setVisibility(session, "pyrrole.D", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "pyrrole.D", newState)
      })
 
    observeEvent(input$toggleAChainVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$A$visible
      components.4our$A$visible <<- newState
-     setVisibility(session, "A", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "A", newState)
      })
 
    observeEvent(input$showAllButton, ignoreInit=TRUE, {
      hideAll()
-     setVisibility(session, "A", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "A", newState)
      })
 
    observeEvent(input$toggleBChainVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$B$visible
      components.4our$B$visible <<- newState
-     setVisibility(session, "B", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "B", newState)
      })
 
    observeEvent(input$toggleGAFdomainVisibilityButton, ignoreInit=TRUE, {
      newState <- !components.4our$gaf$visible
      components.4our$gaf$visible <<- newState
-     setVisibility(session, "gaf", newState)
+     setVisibility(session, htmlContainer="nglShiny_4our", "gaf", newState)
      })
 
    observeEvent(input$showCBDButton, ignoreInit=TRUE, {
@@ -329,10 +331,9 @@ server = function(input, output, session) {
 
   output$value <- renderPrint({input$action})
 
-  options.4our <- list(pdbID="4our", namedComponents=components.4our)
 
   output$nglShiny_4our <- renderNglShiny(
-    nglShiny(options.4our, 300, 300)
+    ngl.4our
     )
 
 } # server
